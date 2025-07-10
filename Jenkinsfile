@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git 'https://github.com/'
+                git 'https://github.com/Moin2811/CICD-Project.git'
             }
         }
 
