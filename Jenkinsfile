@@ -1,32 +1,34 @@
-groovy
-
 pipeline {
-agent any
-environment {
-AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-}
-stages {
-stage('Checkout Code') {
-steps {
-git 'https://github.com/your-repo/terraform-aws.git'
-}
-}
-stage('Initialize Terraform') {
-steps {
-sh 'terraform init'
-}
-}
-stage('Plan Terraform') {
-steps {
-sh 'terraform plan'
-}
-}
-stage('Apply Terraform') {
-steps {
-sh 'terraform apply -auto-approve'
-}
-}
-}
-}
+    agent any
 
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git 'https://github.com/'
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                sh 'terraform init'
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
+                sh 'terraform plan'
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                sh 'terraform apply -auto-approve'
+            }
+        }
+    }
+}
