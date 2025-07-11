@@ -1,34 +1,25 @@
 pipeline {
-    agent any
-
-    environment {
-        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+  agent any
+  stages {
+    stage('Terraform Init') {
+      steps {
+        sh 'terraform init'
+      }
     }
 
-    stages {
-        stage('Checkout Code') {
-            steps {
-                git 'https://github.com/Moin2811/CICD-Project.git'
-            }
+    stage('Terraform Plan') {
+      steps {
+        withCredentials([
+          string(credentialsId: 'AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS_KEY_ID'),
+          string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY')
+        ]) {
+          sh '''
+            terraform plan \
+              -var="aws_access_key=$AWS_ACCESS_KEY_ID" \
+              -var="aws_secret_key=$AWS_SECRET_ACCESS_KEY"
+          '''
         }
-
-        stage('Terraform Init') {
-            steps {
-                sh 'terraform init'
-            }
-        }
-
-        stage('Terraform Plan') {
-            steps {
-                sh 'terraform plan'
-            }
-        }
-
-        stage('Terraform Apply') {
-            steps {
-                sh 'terraform apply -auto-approve'
-            }
-        }
+      }
     }
+  }
 }
