@@ -1,5 +1,6 @@
 pipeline {
   agent any
+
   stages {
     stage('Terraform Init') {
       steps {
@@ -10,8 +11,11 @@ pipeline {
     stage('Terraform Plan') {
       steps {
         withCredentials([
-          string(credentialsId: 'AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS'),
-          string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_ACCESS')
+          usernamePassword(
+            credentialsId: 'AWS_ACCESS',
+            usernameVariable: 'AWS_ACCESS_KEY_ID',
+            passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+          )
         ]) {
           sh '''
             terraform plan \
@@ -21,5 +25,25 @@ pipeline {
         }
       }
     }
+
+    stage('Terraform Apply') {
+      steps {
+        withCredentials([
+          usernamePassword(
+            credentialsId: 'AWS_ACCESS',
+            usernameVariable: 'AWS_ACCESS_KEY_ID',
+            passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+          )
+        ]) {
+          input message: 'Proceed with Terraform apply?'
+          sh '''
+            terraform apply -auto-approve \
+              -var="aws_access_key=$AWS_ACCESS_KEY_ID" \
+              -var="aws_secret_key=$AWS_SECRET_ACCESS_KEY"
+          '''
+        }
+      }
+    }
   }
 }
+
